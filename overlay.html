@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLBB Draft Overlay</title>
+    <link rel="stylesheet" href="overlay.css">
+</head>
+
+<body>
+    <div class="overlay-container">
+        <!-- Top Info: Phase and Timer -->
+        <div class="top-info">
+            <div id="phase-display" class="phase-text">BAN PHASE</div>
+            <div id="timer-display" class="timer-text">30</div>
+        </div>
+
+        <!-- Team Names -->
+        <div id="team-left-name" class="team-name team-left-pos">TEAM LEFT</div>
+        <div id="team-right-name" class="team-name team-right-pos">TEAM RIGHT</div>
+
+        <!-- Bans Section -->
+        <div id="ban-left-0-container" class="ban-slot"><img id="ban-left-0" class="hero-portrait ban-portrait"></div>
+        <div id="ban-left-1-container" class="ban-slot"><img id="ban-left-1" class="hero-portrait ban-portrait"></div>
+        <div id="ban-left-2-container" class="ban-slot"><img id="ban-left-2" class="hero-portrait ban-portrait"></div>
+        <div id="ban-left-3-container" class="ban-slot"><img id="ban-left-3" class="hero-portrait ban-portrait"></div>
+        <div id="ban-left-4-container" class="ban-slot"><img id="ban-left-4" class="hero-portrait ban-portrait"></div>
+
+        <div id="ban-right-0-container" class="ban-slot"><img id="ban-right-0" class="hero-portrait ban-portrait"></div>
+        <div id="ban-right-1-container" class="ban-slot"><img id="ban-right-1" class="hero-portrait ban-portrait"></div>
+        <div id="ban-right-2-container" class="ban-slot"><img id="ban-right-2" class="hero-portrait ban-portrait"></div>
+        <div id="ban-right-3-container" class="ban-slot"><img id="ban-right-3" class="hero-portrait ban-portrait"></div>
+        <div id="ban-right-4-container" class="ban-slot"><img id="ban-right-4" class="hero-portrait ban-portrait"></div>
+
+        <!-- Left Picks - Each with unique ID for individual positioning -->
+        <div id="pick-left-0-container" class="hero-slot">
+            <img id="pick-left-0" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-left-0">PLAYER 1</div>
+            </div>
+        </div>
+        <div id="pick-left-1-container" class="hero-slot">
+            <img id="pick-left-1" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-left-1">PLAYER 2</div>
+            </div>
+        </div>
+        <div id="pick-left-2-container" class="hero-slot">
+            <img id="pick-left-2" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-left-2">PLAYER 3</div>
+            </div>
+        </div>
+        <div id="pick-left-3-container" class="hero-slot">
+            <img id="pick-left-3" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-left-3">PLAYER 4</div>
+            </div>
+        </div>
+        <div id="pick-left-4-container" class="hero-slot">
+            <img id="pick-left-4" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-left-4">PLAYER 5</div>
+            </div>
+        </div>
+
+        <!-- Right Picks - Each with unique ID for individual positioning -->
+        <div id="pick-right-0-container" class="hero-slot">
+            <img id="pick-right-0" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-right-0">PLAYER 6</div>
+            </div>
+        </div>
+        <div id="pick-right-1-container" class="hero-slot">
+            <img id="pick-right-1" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-right-1">PLAYER 7</div>
+            </div>
+        </div>
+        <div id="pick-right-2-container" class="hero-slot">
+            <img id="pick-right-2" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-right-2">PLAYER 8</div>
+            </div>
+        </div>
+        <div id="pick-right-3-container" class="hero-slot">
+            <img id="pick-right-3" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-right-3">PLAYER 9</div>
+            </div>
+        </div>
+        <div id="pick-right-4-container" class="hero-slot">
+            <img id="pick-right-4" class="hero-portrait">
+            <div class="player-name-strip">
+                <div class="player-name" id="name-right-4">PLAYER 10</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        console.log("Overlay Loaded and Ready");
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === STATE_KEYS.DRAFT_STATE) {
+                console.log("Storage Update Received");
+                renderOverlay(JSON.parse(e.newValue));
+            }
+        });
+
+        function renderOverlay(state) {
+            if (!state) return;
+
+            // Update Phase and Timer
+            const phaseEl = document.getElementById('phase-display');
+            const timerEl = document.getElementById('timer-display');
+            if (phaseEl) phaseEl.textContent = state.phase || "BAN PHASE";
+            if (timerEl) {
+                timerEl.textContent = state.timer !== undefined ? state.timer : 30;
+                timerEl.style.color = state.timer <= 10 ? '#ff4d4d' : 'var(--gold)';
+            }
+
+            // Update Team Names
+            const tln = document.getElementById('team-left-name');
+            const trn = document.getElementById('team-right-name');
+            if (tln) tln.textContent = (state.teamNames && state.teamNames.left) ? state.teamNames.left : "TEAM LEFT";
+            if (trn) trn.textContent = (state.teamNames && state.teamNames.right) ? state.teamNames.right : "TEAM RIGHT";
+
+            // Render Bans
+            ['left', 'right'].forEach(side => {
+                if (state.bans && state.bans[side]) {
+                    state.bans[side].forEach((hero, index) => {
+                        const img = document.getElementById(`ban-${side}-${index}`);
+                        const container = document.getElementById(`ban-${side}-${index}-container`);
+                        
+                        if (img) updatePortrait(img, hero, 'bans');
+                        
+                        // Apply Active Class
+                        if (container) {
+                            const isActive = state.activeSlots && state.activeSlots.bans[side][index];
+                            if (isActive) {
+                                container.classList.add('active');
+                            } else {
+                                container.classList.remove('active');
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Render Picks
+            ['left', 'right'].forEach(side => {
+                if (state.picks && state.picks[side]) {
+                    state.picks[side].forEach((slot, index) => {
+                        const img = document.getElementById(`pick-${side}-${index}`);
+                        const container = document.getElementById(`pick-${side}-${index}-container`);
+                        const nameEl = document.getElementById(`name-${side}-${index}`);
+                        
+                        if (img) updatePortrait(img, slot.hero, 'picks');
+                        if (nameEl) nameEl.textContent = slot.player;
+
+                        // Apply Active Class
+                        if (container) {
+                            const isActive = state.activeSlots && state.activeSlots.picks[side][index];
+                            if (isActive) {
+                                container.classList.add('active');
+                            } else {
+                                container.classList.remove('active');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updatePortrait(imgEl, hero, type) {
+            if (!hero) {
+                imgEl.src = '';
+                imgEl.classList.remove('active');
+                imgEl.classList.remove('premium-reveal');
+                return;
+            }
+
+            if (imgEl.src.includes(hero.image)) return;
+
+            imgEl.classList.remove('active');
+            imgEl.classList.remove('premium-reveal');
+
+            setTimeout(() => {
+                imgEl.src = hero.image;
+                if (type === 'picks') {
+                    imgEl.classList.add('premium-reveal');
+                } else {
+                    imgEl.classList.add('active');
+                }
+            }, 50);
+        }
+
+        // Initial render
+        const state = getDraftState();
+        renderOverlay(state);
+    </script>
+</body>
+
+</html>

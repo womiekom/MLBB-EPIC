@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draft Control Panel</title>
+    <link rel="stylesheet" href="control.css">
+</head>
+
+<body>
+    <div class="control-container">
+        <h1>EPIC MLBB Operator Panel</h1>
+
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <div class="team-config">
+                <h3>Team Names</h3>
+                <div class="input-group">
+                    <input type="text" id="teamLeft" placeholder="Left Team Name">
+                    <input type="text" id="teamRight" placeholder="Right Team Name">
+                </div>
+            </div>
+
+            <div class="timer-controls">
+                <h3>Timer Control</h3>
+                <div class="input-group">
+                    <input type="number" id="timerSet" value="30" style="width: 60px;">
+                    <button id="setTimerBtn" class="btn">Set</button>
+                    <button id="startBtn" class="btn btn-green">Start</button>
+                    <button id="resetTimerBtn" class="btn btn-red">Reset</button>
+                </div>
+                <div id="timerDisplay"
+                    style="font-size: 24px; font-weight: bold; margin-top: 10px; color: var(--gold);">30s</div>
+            </div>
+
+            <div class="phase-config">
+                <h3>Draft Phase</h3>
+                <select id="phaseSelect" class="search-bar" style="padding: 5px; width: 100%;">
+                    <option value="BAN PHASE">BAN PHASE</option>
+                    <option value="PICK PHASE">PICK PHASE</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="player-config">
+            <div class="team-players">
+                <h3>Left Players</h3>
+                <div id="leftPlayerInputs" class="player-inputs">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+            <div class="team-players">
+                <h3>Right Players</h3>
+                <div id="rightPlayerInputs" class="player-inputs">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Slot Selector Section -->
+        <div class="slot-selector">
+            <!-- Left Team -->
+            <div class="team-controls">
+                <h3 id="displayTeamLeft">Left Team</h3>
+                <div class="ban-buttons" id="btns-bans-left">
+                    <!-- JS Injected Buttons -->
+                </div>
+                <div class="pick-buttons" id="btns-picks-left">
+                    <!-- JS Injected Buttons -->
+                </div>
+            </div>
+
+            <!-- Right Team -->
+            <div class="team-controls">
+                <h3 id="displayTeamRight">Right Team</h3>
+                <div class="ban-buttons" id="btns-bans-right">
+                    <!-- JS Injected Buttons -->
+                </div>
+                <div class="pick-buttons" id="btns-picks-right">
+                    <!-- JS Injected Buttons -->
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button id="clearSlotBtn" class="reset-btn">Clear Selected Slot</button>
+            <button id="fullResetBtn" class="reset-btn" style="background: #555;">Full Draft Reset</button>
+            <div style="flex-grow: 1;"></div>
+            <input type="text" id="heroSearch" class="search-bar" placeholder="Search Hero..." style="width: 300px;">
+        </div>
+
+        <div class="hero-grid" id="heroGrid">
+            <!-- Heroes will be injected here -->
+        </div>
+    </div>
+
+    <script src="heroes.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let currentState = getDraftState();
+        let timerInterval = null;
+
+        const grid = document.getElementById('heroGrid');
+        const searchInput = document.getElementById('heroSearch');
+
+        function init() {
+            renderPlayerInputs();
+            updateControlUI();
+            renderSlotButtons();
+            renderHeroes();
+            syncTimerState();
+        }
+
+        function updateControlUI() {
+            if (!currentState.teamNames) currentState.teamNames = { left: "TEAM LEFT", right: "TEAM RIGHT" };
+            if (!currentState.activeSlots) currentState.activeSlots = JSON.parse(JSON.stringify(DEFAULT_STATE.activeSlots));
+            
+            document.getElementById('teamLeft').value = currentState.teamNames.left;
+            document.getElementById('teamRight').value = currentState.teamNames.right;
+            document.getElementById('displayTeamLeft').textContent = currentState.teamNames.left;
+            document.getElementById('displayTeamRight').textContent = currentState.teamNames.right;
+            document.getElementById('phaseSelect').value = currentState.phase || "BAN PHASE";
+            document.getElementById('timerSet').value = currentState.timerDuration || 30;
+            
+            ['left', 'right'].forEach(side => {
+                currentState.picks[side].forEach((slot, index) => {
+                    const input = document.getElementById(`player-${side}-${index}`);
+                    if (input) input.value = slot.player;
+                });
+            });
+        }
+
+        function renderPlayerInputs() {
+            ['left', 'right'].forEach(side => {
+                const container = document.getElementById(`${side}PlayerInputs`);
+                if (!container) return;
+                container.innerHTML = '';
+                currentState.picks[side].forEach((slot, index) => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = `player-${side}-${index}`;
+                    input.className = 'player-input-field';
+                    input.placeholder = `Player ${index + 1}`;
+                    input.value = slot.player;
+                    input.addEventListener('change', (e) => {
+                        currentState.picks[side][index].player = e.target.value;
+                        saveDraftState(currentState);
+                    });
+                    container.appendChild(input);
+                });
+            });
+        }
+
+        function updateTeamNames() {
+            currentState.teamNames.left = document.getElementById('teamLeft').value;
+            currentState.teamNames.right = document.getElementById('teamRight').value;
+            saveDraftState(currentState);
+            updateControlUI();
+        }
+
+        function renderSlotButtons() {
+            const containers = {
+                'bans-left': document.getElementById('btns-bans-left'),
+                'picks-left': document.getElementById('btns-picks-left'),
+                'bans-right': document.getElementById('btns-bans-right'),
+                'picks-right': document.getElementById('btns-picks-right')
+            };
+
+            Object.values(containers).forEach(c => { if(c) c.innerHTML = ''; });
+
+            ['left', 'right'].forEach(side => {
+                currentState.bans[side].forEach((hero, index) => {
+                    const btn = createSlotBtn('bans', side, index, hero ? hero.name : `BAN ${index + 1}`);
+                    if (containers[`bans-${side}`]) containers[`bans-${side}`].appendChild(btn);
+                });
+            });
+
+            ['left', 'right'].forEach(side => {
+                currentState.picks[side].forEach((slot, index) => {
+                    const label = slot.hero ? slot.hero.name : slot.role;
+                    const btn = createSlotBtn('picks', side, index, label);
+                    if (containers[`picks-${side}`]) containers[`picks-${side}`].appendChild(btn);
+                });
+            });
+        }
+
+        function createSlotBtn(type, side, index, label) {
+            const container = document.createElement('div');
+            container.style.position = 'relative';
+            container.style.flex = '1';
+            container.style.margin = '2px';
+
+            const btn = document.createElement('button');
+            const isActive = currentState.selectedSlot.type === type && 
+                             currentState.selectedSlot.side === side && 
+                             currentState.selectedSlot.index === index;
+            
+            btn.className = `slot-btn ${isActive ? 'active' : ''}`;
+            const isFilled = type === 'bans' ? currentState.bans[side][index] : currentState.picks[side][index].hero;
+            if (isFilled) btn.classList.add('has-hero');
+
+            btn.textContent = label;
+            btn.addEventListener('click', () => {
+                currentState.selectedSlot = { type, side, index };
+                saveDraftState(currentState);
+                renderSlotButtons();
+            });
+
+            // Active Toggle Button
+            const toggle = document.createElement('button');
+            const isHighlighted = currentState.activeSlots && currentState.activeSlots[type][side][index];
+            toggle.className = `slot-toggle ${isHighlighted ? 'active' : ''}`;
+            toggle.title = "Toggle Active Highlight";
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentState = toggleActiveSlot(type, side, index);
+                renderSlotButtons();
+            });
+
+            container.appendChild(btn);
+            container.appendChild(toggle);
+            return container;
+        }
+
+        function renderHeroes(filter = '') {
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            const filteredHeroes = heroes.filter(h => 
+                h.name.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            filteredHeroes.forEach(hero => {
+                const card = document.createElement('div');
+                const taken = isHeroTaken(hero.id, currentState);
+                card.className = `hero-card ${taken ? 'disabled' : ''}`;
+                
+                card.innerHTML = `
+                    <img src="${hero.image}" alt="${hero.name}">
+                    <div class="name">${hero.name}</div>
+                `;
+                
+                if (!taken) {
+                    card.addEventListener('click', () => {
+                        const { type, side, index } = currentState.selectedSlot;
+                        if (type === 'bans') {
+                            currentState.bans[side][index] = hero;
+                        } else {
+                            currentState.picks[side][index].hero = hero;
+                        }
+                        saveDraftState(currentState);
+                        renderSlotButtons();
+                        renderHeroes(searchInput.value);
+                    });
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function syncTimerState() {
+            const display = document.getElementById('timerDisplay');
+            const startBtn = document.getElementById('startBtn');
+            if (!display || !startBtn) return;
+
+            display.textContent = `${currentState.timer}s`;
+            display.style.color = currentState.timer <= 10 ? '#ff4d4d' : 'var(--gold)';
+            startBtn.textContent = currentState.timerActive ? 'Pause' : 'Start';
+            startBtn.className = `btn ${currentState.timerActive ? 'btn-yellow' : 'btn-green'}`;
+
+            if (currentState.timerActive && !timerInterval) {
+                timerInterval = setInterval(() => {
+                    if (currentState.timer > 0) {
+                        currentState.timer--;
+                        saveDraftState(currentState);
+                        display.textContent = `${currentState.timer}s`;
+                        if (currentState.timer <= 10) display.style.color = '#ff4d4d';
+                    } else {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        currentState.timerActive = false;
+                        saveDraftState(currentState);
+                        syncTimerState();
+                    }
+                }, 1000);
+            } else if (!currentState.timerActive && timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        document.getElementById('teamLeft').addEventListener('change', updateTeamNames);
+        document.getElementById('teamRight').addEventListener('change', updateTeamNames);
+        document.getElementById('phaseSelect').addEventListener('change', (e) => {
+            currentState.phase = e.target.value;
+            saveDraftState(currentState);
+        });
+        document.getElementById('setTimerBtn').addEventListener('click', () => {
+            const duration = parseInt(document.getElementById('timerSet').value) || 30;
+            currentState.timer = duration;
+            currentState.timerDuration = duration;
+            currentState.timerActive = false;
+            saveDraftState(currentState);
+            syncTimerState();
+        });
+        document.getElementById('startBtn').addEventListener('click', () => {
+            currentState.timerActive = !currentState.timerActive;
+            saveDraftState(currentState);
+            syncTimerState();
+        });
+        document.getElementById('resetTimerBtn').addEventListener('click', () => {
+            currentState.timer = currentState.timerDuration;
+            currentState.timerActive = false;
+            saveDraftState(currentState);
+            syncTimerState();
+        });
+        document.getElementById('clearSlotBtn').addEventListener('click', () => {
+            const { type, side, index } = currentState.selectedSlot;
+            if (type === 'bans') {
+                currentState.bans[side][index] = null;
+            } else {
+                currentState.picks[side][index].hero = null;
+            }
+            saveDraftState(currentState);
+            renderSlotButtons();
+            renderHeroes(searchInput.value);
+        });
+        document.getElementById('fullResetBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset the entire draft? This will clear all bans and picks.')) {
+                resetDraftState();
+                currentState = getDraftState();
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = null;
+                init();
+            }
+        });
+        searchInput.addEventListener('input', (e) => renderHeroes(e.target.value));
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === STATE_KEYS.DRAFT_STATE) {
+                currentState = JSON.parse(e.newValue);
+                updateControlUI();
+                renderSlotButtons();
+                renderHeroes(searchInput.value);
+                syncTimerState();
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

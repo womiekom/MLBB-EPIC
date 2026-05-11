@@ -1,0 +1,230 @@
+:root {
+    --purple-primary: #6a0dad;
+    --purple-dark: #2e0854;
+    --gold: #ffd700;
+    --text-white: #ffffff;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-white);
+    background-color: #121212;
+    overflow-y: auto; /* Enable scrolling for control panel */
+}
+
+/* Control Panel Container */
+.control-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.config-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.input-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.input-group input {
+    padding: 8px;
+    background: #333;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 4px;
+    flex-grow: 1;
+}
+
+.btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background: #444;
+}
+
+.btn-green { background: #2e7d32; }
+.btn-red { background: #c62828; }
+.btn-yellow { background: #f9a825; color: black; }
+
+.player-config {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.player-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: #1e1e1e;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.player-input-field {
+    padding: 5px 10px;
+    background: #333;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.slot-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.team-controls h3 {
+    margin: 0 0 10px 0;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.ban-buttons, .pick-buttons {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.slot-btn {
+    padding: 8px;
+    background: #333;
+    border: 2px solid transparent;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    flex: 1;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 10px;
+}
+
+.slot-btn.active {
+    border-color: var(--gold);
+    background: var(--purple-primary);
+}
+
+.slot-btn.has-hero {
+    color: var(--gold);
+}
+
+.slot-toggle {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    background: #444;
+    border: 2px solid #222;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 5;
+    transition: all 0.2s;
+}
+
+.slot-toggle.active {
+    background: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+    border-color: white;
+}
+
+.action-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: #1e1e1e;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.reset-btn {
+    padding: 8px 15px;
+    background: #d32f2f;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.search-bar {
+    padding: 12px;
+    font-size: 16px;
+    background: #333;
+    border: 2px solid var(--purple-primary);
+    color: white;
+    border-radius: 8px;
+}
+
+/* Hero Grid Specifics */
+.hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    padding: 10px;
+    background: #1e1e1e;
+    border-radius: 8px;
+    min-height: 300px; /* Ensure it has height */
+}
+
+.hero-card {
+    cursor: pointer;
+    background: #333;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    border-radius: 4px;
+    position: relative;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+}
+
+.hero-card:hover {
+    border-color: var(--gold);
+    transform: scale(1.05);
+}
+
+.hero-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-card .name {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    font-size: 9px;
+    text-align: center;
+    padding: 3px 0;
+    font-weight: bold;
+}
+
+.hero-card.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}

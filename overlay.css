@@ -1,0 +1,351 @@
+:root {
+    --purple-primary: #6a0dad;
+    --purple-dark: #2e0854;
+    --gold: #ffd700;
+    --text-white: #ffffff;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-white);
+    background-color: #000;
+    overflow: hidden;
+}
+
+/* Overlay Layout - EXACT FOUNDATION SIZING */
+.overlay-container {
+    width: 1090px;
+    height: 550px;
+    background-image: url('Assets/background.jpeg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+/* TOP INFO (Phase & Timer) */
+.top-info {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 100;
+}
+
+.phase-text {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.timer-text {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* TEAM NAMES */
+.team-name {
+    position: absolute;
+    top: 65px;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text-white);
+    text-transform: uppercase;
+    width: 300px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    z-index: 10;
+}
+
+.team-left-pos {
+    left: 95px;
+    text-align: left;
+}
+
+.team-right-pos {
+    right: 95px;
+    text-align: right;
+}
+
+/* BAN SLOTS (Small) */
+.ban-slot {
+    position: absolute;
+    width: 55px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    filter: grayscale(100%);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    transition: border-color 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
+}
+
+.ban-slot::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.35;
+    background: black;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Ban Positioning (Foundation) */
+#ban-left-0-container {
+    top: 120px;
+    left: 97px;
+}
+
+#ban-left-1-container {
+    top: 120px;
+    left: 160px;
+}
+
+#ban-left-2-container {
+    top: 120px;
+    left: 224px;
+}
+
+#ban-left-3-container {
+    top: 120px;
+    left: 285px;
+}
+
+#ban-left-4-container {
+    top: 120px;
+    left: 350px;
+}
+
+#ban-right-0-container {
+    top: 120px;
+    right: 97px;
+}
+
+#ban-right-1-container {
+    top: 120px;
+    right: 160px;
+}
+
+#ban-right-2-container {
+    top: 120px;
+    right: 224px;
+}
+
+#ban-right-3-container {
+    top: 120px;
+    right: 285px;
+}
+
+#ban-right-4-container {
+    top: 120px;
+    right: 350px;
+}
+
+/* Pick Positioning (Foundation) */
+.hero-slot {
+    position: absolute;
+    width: 105.5px;
+    height: 184.5px;
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+#pick-left-0-container {
+    bottom: 192px;
+    left: 5px;
+}
+
+#pick-left-1-container {
+    bottom: 192px;
+    left: 113px;
+}
+
+#pick-left-2-container {
+    bottom: 192px;
+    left: 220px;
+}
+
+#pick-left-3-container {
+    bottom: 192px;
+    left: 328px;
+}
+
+#pick-left-4-container {
+    bottom: 192px;
+    left: 435px;
+}
+
+#pick-right-0-container {
+    bottom: 192px;
+    right: 435px;
+}
+
+#pick-right-1-container {
+    bottom: 192px;
+    right: 328px;
+}
+
+#pick-right-2-container {
+    bottom: 192px;
+    right: 220px;
+}
+
+#pick-right-3-container {
+    bottom: 192px;
+    right: 113px;
+}
+
+#pick-right-4-container {
+    bottom: 192px;
+    right: 5px;
+}
+
+.hero-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    opacity: 0;
+}
+
+.ban-portrait {
+    object-position: center 20%;
+    transform: scale(1.15);
+}
+
+.hero-portrait.active {
+    animation: portrait-in 0.3s ease-out forwards;
+}
+
+@keyframes portrait-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.ban-portrait.active {
+    animation: ban-portrait-in 0.3s ease-out forwards;
+}
+
+@keyframes ban-portrait-in {
+    from {
+        opacity: 0;
+        transform: translateY(5px) scale(1.05);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+}
+
+.player-name-strip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 25px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    box-sizing: border-box;
+    transition: background 0.35s ease;
+}
+
+.player-name {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    transition: text-shadow 0.35s ease;
+}
+
+/* --- ACTIVE SLOT HIGHLIGHTS (GOLD THEME) --- */
+
+/* Pick Slots Active — single clean glow, smooth fade via transition */
+.hero-slot.active {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold), 0 0 18px rgba(255, 215, 0, 0.45);
+    animation: slot-breathe 1.8s ease-in-out infinite;
+    z-index: 50;
+}
+
+.hero-slot.active .player-name-strip {
+    background: linear-gradient(transparent, rgba(255, 215, 0, 0.65));
+}
+
+.hero-slot.active .player-name {
+    text-shadow: 0 0 8px rgba(255, 215, 0, 1), 1px 1px 2px #000;
+}
+
+/* Ban Slots Active — single clean glow, no double shadow */
+.ban-slot.active {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold), 0 0 14px rgba(255, 215, 0, 0.45);
+    filter: grayscale(0%);
+    animation: slot-breathe 1.8s ease-in-out infinite;
+    z-index: 50;
+}
+
+/* Single shared breathe keyframe — replaces gold-backlight-pulse */
+@keyframes slot-breathe {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 1px var(--gold), 0 0 12px rgba(255, 215, 0, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 0 1px var(--gold), 0 0 26px rgba(255, 215, 0, 0.6);
+    }
+}
+
+/* --- PREMIUM REVEAL ANIMATIONS --- */
+
+.hero-portrait.premium-reveal {
+    animation: premium-reveal-in 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+@keyframes premium-reveal-in {
+    0% {
+        opacity: 0;
+        transform: scale(1.15) translateY(10px);
+        filter: brightness(0);
+    }
+
+    30% {
+        opacity: 1;
+        filter: brightness(2);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: brightness(1);
+    }
+}
